@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation } from "@apollo/client";
+import { SAVE_BOOK } from "../utils/mutations";
 import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+// import { saveBook, searchGoogleBooks } from '../utils/API';
+// This searchGoogleBooks is still a REST API
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -14,10 +18,18 @@ const SearchBooks = () => {
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
+  // save book using graphql
+  const [saveBook] = useMutation(SAVE_BOOK);
+
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
-    return () => saveBookIds(savedBookIds);
+    // return () => saveBookIds(savedBookIds);
+    saveBookIds(savedBookIds);
+    return function cleanup() {
+      // on cleanup delete localstorage by passing an empty array
+      saveBookIds([]);
+    }
   });
 
   // create method to search for books and set state on form submit
@@ -65,11 +77,16 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
+      // const response = await saveBook(bookToSave, token);
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
+      // if (!response.ok) {
+      //   throw new Error('something went wrong!');
+      // }
+      const d = { ...bookToSave };
+      console.log(d);
+      await saveBook({
+        variables: { ...bookToSave },
+      })
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
