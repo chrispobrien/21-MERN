@@ -17,13 +17,19 @@ const resolvers = {
 
       throw new AuthenticationError("Not logged in");
     },
-    // getSingleUser: async (parent, { username }) => {
-    //   return User.findOne({ username })
-    //   .select("-__v -password");
-    // },
+    getUser: async (parent, args) => {
+      const users = await User.find({}).select("-__v -password");
+      return users;
+    },
+    getSingleUser: async (parent, { username }) => {
+      console.log(username);
+      const userData = await User.findOne({ username }).select("-__v -password");
+      console.log(userData);
+      return userData;
+    },
   },
   Mutation: {
-    createUser: async (parent, args) => {
+    addUser: async (parent, args) => {
       const user = await User.create(args);
       const token = signToken(user);
       return { token, user };

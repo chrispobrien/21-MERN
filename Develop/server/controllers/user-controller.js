@@ -4,6 +4,12 @@ const { User } = require('../models');
 const { signToken } = require('../utils/auth');
 
 module.exports = {
+  // get all users for debug purposes
+  async getUser(req, res)  {
+    const users = await User.find({});
+    res.json(users);
+  },
+
   // get a single user by either their id or their username
   async getSingleUser({ user = null, params }, res) {
     const foundUser = await User.findOne({
@@ -17,7 +23,7 @@ module.exports = {
     res.json(foundUser);
   },
   // create a user, sign a token, and send it back (to client/src/components/SignUpForm.js)
-  async createUser({ body }, res) {
+  async addUser({ body }, res) {
     const user = await User.create(body);
 
     if (!user) {
