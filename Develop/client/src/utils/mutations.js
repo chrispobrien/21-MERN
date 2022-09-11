@@ -64,7 +64,14 @@ export const REMOVE_BOOK = gql`
     ) {
       _id
       username
-      savedBooks
+      savedBooks {
+        authors
+        description
+        bookId
+        image
+        link
+        title
+      }
     }
   }
 `;

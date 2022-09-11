@@ -6,7 +6,6 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        console.log(context.user);
         const username = context.user.username;
         const userData = await User.findOne({ username }).select(
           "-__v -password"
@@ -22,9 +21,7 @@ const resolvers = {
       return users;
     },
     getSingleUser: async (parent, { username }) => {
-      console.log(username);
       const userData = await User.findOne({ username }).select("-__v -password");
-      console.log(userData);
       return userData;
     },
   },
@@ -75,7 +72,7 @@ const resolvers = {
           { _id: context.user._id },
           {
             $pull: {
-              savedBooks: bookId,
+              savedBooks: { bookId: bookId },
             },
           },
           { new: true, runValidators: true }

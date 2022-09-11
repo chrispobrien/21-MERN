@@ -12,9 +12,27 @@ const SavedBooks = () => {
 
   // graphql query hook and mutation
   const { loading, data } = useQuery(GET_ME);
-  const deleteBook = useMutation(REMOVE_BOOK);
+  const [deleteBook, { error }] = useMutation(REMOVE_BOOK);
+
+  const user = data?.me;
+  if (!user?.username) {
+    return (
+      <h4>
+        You need to be logged in to see this page. Use the navigation links
+        above to sign up or log in!
+      </h4>
+    );
+  }
 
   const handleDeleteBook = async (bookId) => {
+    try {
+      await deleteBook({ variables: {bookId: bookId} });
+      // removeBookId(bookId);
+    } catch (e) {
+      console.log(e);
+      console.log(error);
+      throw new Error('something went wrong!');
+    }
   }
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   // const handleDeleteBook = async (bookId) => {
@@ -40,8 +58,6 @@ const SavedBooks = () => {
   //   }
   // };
 
-  console.log(loading, data);
-  
   return (
     <>
       <Jumbotron fluid className='text-light bg-dark'>
